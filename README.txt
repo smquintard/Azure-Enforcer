@@ -61,7 +61,6 @@ What will happen:
     - Deploy-StorageAccount
     - Deploy-FunctionApp
     - Set-FunctionAppSettings
-    - Clone-And-Build-project
     - Publish-FunctionApp
 
 6. Customize Paths or logic
