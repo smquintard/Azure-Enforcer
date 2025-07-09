@@ -1,0 +1,15 @@
+{
+    "RESOURCE_GROUP": "",
+    "FRONT_DOOR_PROFILE": "",
+    "FRONTDOOR_SKU": "",
+    "FUNCTION_APP_NAME": "",
+    "BACKEND_FQDN": "",
+    "LOCATION": "",
+    "STORAGE_ACCOUNT": "",
+    "STORAGE_SKU": "",
+    "PX_APPID": "",
+    "PX_AUTH_TOKEN": "",
+    "PX_COOKIE_SECRET": "",
+    "RULESET_NAME": "",
+    "ENDPOINT": ""
+}
