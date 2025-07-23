@@ -1,10 +1,11 @@
 # deploy.ps1
 
 # Require login at the beginning
+Write-Host "`n🔐 Logging into Azure..." -ForegroundColor Cyan
 az login | Out-Null
 
 # Run npm update check early
-Write-Host "`n🔍 Checking for npm updates..." -ForegroundColor Cyan
+Write-Host "`n🔍 Checking for global npm updates..." -ForegroundColor Cyan
 try {
     npm update -g
     Write-Host "✅ npm packages updated successfully." -ForegroundColor Green
@@ -16,25 +17,31 @@ try {
 $configPath = "$PSScriptRoot\config.json"
 
 if (Test-Path $configPath) {
-    $config = Get-Content $configPath | ConvertFrom-Json
+    $Config = Get-Content $configPath | ConvertFrom-Json
 } else {
-    $config = [PSCustomObject]@{}
+    $Config = [PSCustomObject]@{}
 }
 
-# Load module
-Import-Module "$PSScriptRoot\modules\azureDeploy.psm1" -Force
+# Load deployment module
+$modulePath = "$PSScriptRoot\modules\azureDeploy.psm1"
+if (Test-Path $modulePath) {
+    Import-Module $modulePath -Force
+} else {
+    Write-Error "❌ Module not found at path: $modulePath"
+    exit 1
+}
 
 # Prompt for missing values
-$config = Prompt-MissingValues -config $config
+$Config = Prompt-MissingValues -Config (load-Config -Path $configPath)
+
+#Run Deployment Steps
+Deploy-StorageAccount -Config $Config
+Deploy-FunctionApp -Config $Config
+Set-FunctionAppSettings -Config $Config
+Publish-FunctionApp -Config $Config
+Configure-FrontDoorRuleset -Config $Config
 
 # Save config
-Save-Config -config $config -path $configPath
-
-# Begin deployment steps
-Deploy-StorageAccount -config $config
-Deploy-FunctionApp -config $config
-Set-FunctionAppSettings -config $config
-Clone-And-Build-Project
-Publish-FunctionApp -config $config
+Save-Config -Config $Config -Path ".\config.json"
 
 Write-Host "`n🎉 Deployment complete!" -ForegroundColor Green
